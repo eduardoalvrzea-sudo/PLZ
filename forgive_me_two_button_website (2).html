@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forgive Me?</title>
+  <style>
+    :root {
+      --yes: #22c55e;
+      --no: #ef4444;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.8);
+      --card: rgba(0,0,0,0.45);
+      --ring: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+    html, body { height:100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial;
+      color: var(--text);
+      background: radial-gradient(circle at 20% 20%, #2c3e50 0%, #1f2937 60%, #0b1220 100%);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      transition: background 1.5s ease;
+    }
+
+    .card {
+      width: min(820px, 94vw);
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 20px;
+      box-shadow: var(--ring);
+      padding: 28px 28px 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      position: relative;
+      z-index: 2;
+      text-align:center;
+    }
+    h1 { margin: 8px 0 4px; font-size: clamp(24px, 3vw, 36px); line-height: 1.15; letter-spacing: -0.02em; }
+    p { color: var(--muted); margin: 0 0 18px; }
+
+    .buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    button { border: 0; padding: 12px 18px; border-radius: 999px; font-size: 16px; cursor: pointer; transition: transform .06s ease, box-shadow .2s ease, background .2s ease; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); }
+    button:active { transform: translateY(1px) scale(0.99); }
+    .yes { background: var(--yes); color: white; }
+    .no { background: var(--no); color: white; }
+
+    dialog { border: 0; border-radius: 18px; width: min(560px, 92vw); padding: 20px 18px 16px; box-shadow: var(--ring); background: rgba(17,24,39,0.9); color: #fff; }
+    dialog::backdrop { background: rgba(2,6,23,.35); backdrop-filter: blur(3px); }
+    .modal-title { font-weight: 700; font-size: 20px; margin: 0 0 10px; text-align: center; }
+    .modal-text { color: var(--muted); text-align: center; margin: 0 0 16px; }
+    .modal-actions { display:flex; gap:10px; justify-content:center; }
+
+    .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 3; }
+    .confetti i { position: absolute; width: 8px; height: 12px; border-radius: 2px; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0.9; } }
+
+    .jay-wrap { display:none; margin-top: 18px; text-align:center; }
+
+    .cats { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; transition: background-color 2s ease; }
+    .cat { position: absolute; font-size: clamp(28px, 6vw, 64px); will-change: transform; animation: drift 12s linear infinite; transition: filter 2s ease, transform 2s ease; }
+
+    @keyframes drift { 0%{ transform: translate(-10vw, -10vh) rotate(0deg);} 100%{ transform: translate(110vw, 110vh) rotate(360deg);} }
+    @keyframes sprint { 0%{ transform: translate(-10vw, 10vh) rotate(0deg);} 100%{ transform: translate(110vw, -20vh) rotate(360deg);} }
+    @keyframes spinny { 0%{ transform: translate(10vw, 10vh) rotate(0deg);} 100%{ transform: translate(90vw, 80vh) rotate(1080deg);} }
+    @keyframes zigzag { 0%{ transform: translate(0,0);} 25%{ transform: translate(30vw,10vh) rotate(15deg);} 50%{ transform: translate(10vw,30vh) rotate(-20deg);} 75%{ transform: translate(60vw,-10vh) rotate(10deg);} 100%{ transform: translate(90vw,60vh) rotate(-10deg);} }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="headline">Will you forgive me?</h1>
+    <p id="subtitle">I promise I'll make it up to you. 🙏</p>
+    <div class="buttons">
+      <button id="yes" class="yes">plz forgive me</button>
+      <button id="no" class="no">no</button>
+    </div>
+
+    <div class="jay-wrap" id="jayWrap">
+      <div class="tenor-gif-embed" data-postid="18515895" data-share-method="host" data-aspect-ratio="2.71186" data-width="100%">
+        <a href="https://tenor.com/view/enhypen-jay-enhypen-jake-enhypen-jungwon-enhypen-sunghoon-enhypen-gif-18515895">Enhypen Jay Enhypen GIF</a>
+        from <a href="https://tenor.com/search/enhypen-gifs">Enhypen GIFs</a>
+      </div>
+      <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+    </div>
+  </div>
+
+  <dialog id="askAgain">
+    <div class="modal-title">Hmm… are you sure?</div>
+    <p class="modal-text" id="askText">preety plz? Could you forgive me?</p>
+    <div class="modal-actions">
+      <button class="yes" id="askYes">okay, I forgive you</button>
+      <button class="no" id="askNo">no</button>
+    </div>
+  </dialog>
+
+  <dialog id="confirmYes">
+    <div class="modal-title">Really?</div>
+    <p class="modal-text" id="confirmText">really? preety plz — just to be sure.</p>
+    <div class="modal-actions">
+      <button class="yes" id="confirmYesBtn">yes</button>
+      <button class="no" id="confirmNoBtn">no</button>
+    </div>
+  </dialog>
+
+  <div class="confetti" id="confetti"></div>
+  <div class="cats" id="cats"></div>
+
+  <script>
+    const yesBtn = document.getElementById('yes');
+    const noBtn = document.getElementById('no');
+    const askDialog = document.getElementById('askAgain');
+    const askText = document.getElementById('askText');
+    const askYes = document.getElementById('askYes');
+    const askNo = document.getElementById('askNo');
+    const confirmDialog = document.getElementById('confirmYes');
+    const confirmText = document.getElementById('confirmText');
+    const confirmYesBtn = document.getElementById('confirmYesBtn');
+    const confirmNoBtn = document.getElementById('confirmNoBtn');
+    const headline = document.getElementById('headline');
+    const subtitle = document.getElementById('subtitle');
+    const jayWrap = document.getElementById('jayWrap');
+    const confettiRoot = document.getElementById('confetti');
+    const catsRoot = document.getElementById('cats');
+
+    const baseStarts = ['preety plz', 'pretty plz', 'pretty please', 'plz', 'please', 'pretty please with a cherry on top', 'i’m asking kindly', 'one last time, pretty plz'];
+    const middles = ['could you forgive me?', 'would you consider forgiving me?', 'forgive me this once?', 'can I earn your forgiveness?', 'accept my apology?', 'let me make amends?', 'give me another shot?'];
+    const closers = ['', '\\ud83d\\ude4f', '\\u2764\\ufe0f', 'I truly mean it.', 'I really am sorry.', 'I’ll do better.'];
+
+    let tries = 0;
+    let yesConfirmCount = 0;
+    let noClicks = 0;
+    let catMode = false;
+    let motionIndex = 0;
+    let sadnessLevel = 0;
+
+    function nextPrompt() {
+      tries++;
+      const start = tries % 3 === 1 ? 'preety plz' : baseStarts[Math.floor(Math.random()*baseStarts.length)];
+      const middle = middles[Math.floor(Math.random()*middles.length)];
+      const closer = closers[Math.floor(Math.random()*closers.length)];
+      let text = `${start}, ${middle}`;
+      if (closer) text += ` ${closer}`;
+      if (tries % 5 === 0) text = `${middle} ${start}! ${closer}`.trim();
+      return text;
+    }
+
+    function showAskAgain() {
+      askText.textContent = nextPrompt();
+      if (!askDialog.open) askDialog.showModal();
+    }
+
+    function showConfirmYes() {
+      confirmText.textContent = `really? ${nextPrompt()}`;
+      if (!confirmDialog.open) confirmDialog.showModal();
+    }
+
+    function celebrate() {
+      const pieces = 140;
+      for (let i = 0; i < pieces; i++) {
+        const node = document.createElement('i');
+        node.style.left = Math.random() * 100 + 'vw';
+        node.style.top = '-10vh';
+        node.style.background = `hsl(${Math.random()*360}, 90%, 60%)`;
+        node.style.animationDuration = (6 + Math.random()*4) + 's';
+        confettiRoot.appendChild(node);
+        setTimeout(() => node.remove(), 12000);
+      }
+    }
+
+    function revealJay() {
+      subtitle.textContent = 'Here\'s Jay from ENHYPEN ✨';
+      jayWrap.style.display = 'block';
+      if (askDialog.open) askDialog.close();
+      if (confirmDialog.open) confirmDialog.close();
+      celebrate();
+    }
+
+    const motions = ['drift','sprint','spinny','zigzag'];
+
+    function spawnCats(count=8) {
+      catsRoot.innerHTML = '';
+      for (let i=0;i<count;i++) {
+        const c = document.createElement('div');
+        c.className = 'cat';
+        c.textContent = '😺';
+        c.style.left = Math.random()*90 + 'vw';
+        c.style.top = Math.random()*80 + 'vh';
+        c.style.animationName = motions[motionIndex];
+        c.style.animationDuration = (8 + Math.random()*6) + 's';
+        c.style.animationDelay = (Math.random()*2) + 's';
+        catsRoot.appendChild(c);
+      }
+    }
+
+    function updateCatsSadness() {
+      const faces = ['😺','😸','😿','😭'];
+      sadnessLevel = Math.min(sadnessLevel + 1, faces.length - 1);
+      catsRoot.style.backgroundColor = `rgba(0,0,0,${sadnessLevel*0.1})`;
+      const cats = catsRoot.querySelectorAll('.cat');
+      cats.forEach(c => {
+        c.textContent = faces[sadnessLevel];
+        c.style.filter = `grayscale(${sadnessLevel*0.3}) blur(${sadnessLevel*0.5}px)`;
+      });
+    }
+
+    function enterCatMode() {
+      catMode = true;
+      headline.textContent = "I'll show you my phil";
+      subtitle.textContent = 'Watch the cats in the background…';
+      spawnCats(10);
+    }
+
+    function advanceCatMotion() {
+      if (!catMode) return;
+      motionIndex = (motionIndex + 1) % motions.length;
+      [...catsRoot.children].forEach(c=>{ c.style.animationName = motions[motionIndex]; });
+      updateCatsSadness();
+    }
+
+    yesBtn.addEventListener('click', () => { showConfirmYes(); });
+
+    noBtn.addEventListener('click', () => {
+      noClicks++;
+      if (noClicks >= 3 && !catMode) enterCatMode();
+      showAskAgain();
+      if (catMode) updateCatsSadness();
+    });
+
+    askYes.addEventListener('click', () => {
+      askDialog.close();
+      showConfirmYes();
+      if (catMode) advanceCatMotion();
+    });
+
+    askNo.addEventListener('click', () => {
+      noClicks++;
+      askText.textContent = nextPrompt();
+      if (noClicks >= 3 && !catMode) enterCatMode();
+      if (catMode) advanceCatMotion();
+    });
+
+    confirmYesBtn.addEventListener('click', () => {
+      yesConfirmCount++;
+      if (yesConfirmCount >= 3) revealJay(); else confirmText.textContent = `really really? ${nextPrompt()}`;
+      if (catMode) advanceCatMotion();
+    });
+
+    confirmNoBtn.addEventListener('click', () => {
+      confirmDialog.close();
+      showAskAgain();
+      noClicks++;
+      if (noClicks >= 3 && !catMode) enterCatMode();
+      if (catMode) advanceCatMotion();
+    });
+
+    askDialog.addEventListener('cancel', e => { e.preventDefault(); askText.textContent = nextPrompt(); if (catMode) advanceCatMotion(); });
+    confirmDialog.addEventListener('cancel', e => { e.preventDefault(); confirmText.textContent = `really? ${nextPrompt()}`; if (catMode) advanceCatMotion(); });
+  </script>
+</body>
+</html>
